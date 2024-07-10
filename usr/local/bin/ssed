@@ -1,0 +1,16 @@
+#!/bin/bash
+# ssed, a safer sed
+# Author: Jan Kessler
+#
+# Returns with exit code 42, if PATTERN wasn't matched and thus ACTION didn't happen.
+#
+# Example usage: ssed foo 's//bar/' baz.txt
+#
+# Detailed explanation of the mechanism: https://stackoverflow.com/a/15966279
+
+PATTERN=$1
+ACTION=$2
+FILE=$3
+
+DELIM='/'
+sed --follow-symlinks "$DELIM$PATTERN$DELIM{$ACTION;h};\${x;$DELIM.$DELIM{x;q0};x;q42}" "$FILE"
