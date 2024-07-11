@@ -14,13 +14,14 @@ set -Eeuo pipefail
 usage() {
   local code=${1-0} # specify exit code when used as alternative to die()
   cat <<EOF
-Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-f] pattern action file
+Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-c N] [...] pattern action file
 
 Invokes sed like: sed "/pattern/{action}" file
 
 Available options:
 
 -h, --help            Print this help and exit
+-c N, --count N       Exit with status 0 only if pattern was matched N times
 --no-follow-symlinks  Do not follow symlinks
 
 Any other options will be passed on to sed.
@@ -49,12 +50,22 @@ parse_params() {
   # default values of variables set from params
   FOLLOW_SYMLINKS=--follow-symlinks
   SED_OPTS=""
+  COUNT_MATCHES=""
 
   while :; do
     case "${1-}" in
     -h | --help) usage ;;
     --no-follow-symlinks) FOLLOW_SYMLINKS=--no-follow-symlinks ;;
     --follow-symlinks)    FOLLOW_SYMLINKS=--follow-symlinks ;;
+    -c | --count)
+      if [[ "$2" != -* && $# -gt 4 ]]
+      then
+        COUNT_MATCHES=$2
+        shift
+      else
+        msg "Error: --count argument requires a value." && usage 1
+      fi
+      ;;
     -?*)
       if [[ "$2" == -* || $# -le 4 ]]
       then
@@ -83,4 +94,20 @@ parse_params() {
 
 parse_params "$@"
 
-sed "$FOLLOW_SYMLINKS" $SED_OPTS "/$PATTERN/{$ACTION;h};\${x;/./{x;q0};x;q42}" "$FILE"
+if [[ -n $COUNT_MATCHES ]]
+then
+  TMPFILE="$(mktemp)"
+  trap 'rm -f -- "$TMPFILE"' EXIT
+  sed "$FOLLOW_SYMLINKS" $SED_OPTS "/$PATTERN/{$ACTION;H};\${ x; w $TMPFILE"$'\n'"; x }" "$FILE"
+  SED_EXIT=$?
+  N_MATCHES=$(wc -l < "$TMPFILE")
+  [[ N_MATCHES -ne 0 ]] && N_MATCHES=$((N_MATCHES - 1))
+  if [[ $N_MATCHES -ne $COUNT_MATCHES ]]
+  then
+    exit 42
+  else
+    exit $SED_EXIT
+  fi
+else
+  sed "$FOLLOW_SYMLINKS" $SED_OPTS "/$PATTERN/{$ACTION;h};\${x;/./{x;q0};x;q42}" "$FILE"
+fi
