@@ -2,15 +2,85 @@
 # ssed, a safer sed
 # Author: Jan Kessler
 #
-# Returns with exit code 42, if PATTERN wasn't matched and thus ACTION didn't happen.
+# Wrapper around sed that returns with exit code 42, if PATTERN wasn't matched and thus ACTION didn't happen.
 #
 # Example usage: ssed foo 's//bar/' baz.txt
 #
 # Detailed explanation of the mechanism: https://stackoverflow.com/a/15966279
+# Script based on stripped down template: https://gist.github.com/Ithanil/b72d61091b73cd8cb0c33de3de593834
 
-PATTERN=$1
-ACTION=$2
-FILE=$3
+set -Eeuo pipefail
 
-DELIM='/'
-sed --follow-symlinks "$DELIM$PATTERN$DELIM{$ACTION;h};\${x;$DELIM.$DELIM{x;q0};x;q42}" "$FILE"
+usage() {
+  local code=${1-0} # specify exit code when used as alternative to die()
+  cat <<EOF
+Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-f] pattern action file
+
+Invokes sed like: sed "/pattern/{action}" file
+
+Available options:
+
+-h, --help            Print this help and exit
+--no-follow-symlinks  Do not follow symlinks
+
+Any other options will be passed on to sed.
+
+Required arguments:
+
+pattern               Pattern to match, e.g. foo
+action                Action to perform, e.g. 's//bar/'
+file                  File to process 
+EOF
+  exit "$code"
+}
+
+msg() {
+  echo >&2 -e "${1-}"
+}
+
+die() {
+  local msg=$1
+  local code=${2-1} # default exit status 1
+  msg "$msg"
+  exit "$code"
+}
+
+parse_params() {
+  # default values of variables set from params
+  FOLLOW_SYMLINKS=--follow-symlinks
+  SED_OPTS=""
+
+  while :; do
+    case "${1-}" in
+    -h | --help) usage ;;
+    --no-follow-symlinks) FOLLOW_SYMLINKS=--no-follow-symlinks ;;
+    --follow-symlinks)    FOLLOW_SYMLINKS=--follow-symlinks ;;
+    -?*)
+      if [[ "$2" == -* || $# -le 4 ]]
+      then
+        SED_OPTS="$SED_OPTS $1"
+      else
+        SED_OPTS="$SED_OPTS $1 ${2-}"
+        shift
+      fi
+      ;;
+    *) break ;;
+    esac
+    shift
+  done
+
+  ARGS=("$@")
+
+  # check required params and arguments
+  [[ ${#ARGS[@]} -ne 3 ]] && msg "Error: Exactly three arguments are required." && usage 1
+
+  PATTERN=${ARGS[0]}
+  ACTION=${ARGS[1]}
+  FILE=${ARGS[2]}
+
+  return 0
+}
+
+parse_params "$@"
+
+sed "$FOLLOW_SYMLINKS" $SED_OPTS "/$PATTERN/{$ACTION;h};\${x;/./{x;q0};x;q42}" "$FILE"
