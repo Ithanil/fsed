@@ -10,4 +10,7 @@ debian/*.substvars
 debian/*.log
 debian/*.debhelper
 debian/*-stamp
-debian/fsed/*
+debian/fsed/
+
+build/*
+!build/README.md
