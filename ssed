@@ -3,6 +3,7 @@
 # Author: Jan Kessler
 #
 # Wrapper around sed that returns with exit code 42, if PATTERN wasn't matched and thus ACTION didn't happen.
+# Also supports a mode where exit code is 42 unless PATTERN was matched exactly N times.
 #
 # Example usage: ssed foo 's//bar/' baz.txt
 #
@@ -98,7 +99,7 @@ if [[ -n $COUNT_MATCHES ]]
 then
   TMPFILE="$(mktemp)"
   trap 'rm -f -- "$TMPFILE"' EXIT
-  sed "$FOLLOW_SYMLINKS" $SED_OPTS "/$PATTERN/{$ACTION;H};\${ x; w $TMPFILE"$'\n'"; x }" "$FILE"
+  sed "$FOLLOW_SYMLINKS" $SED_OPTS "/$PATTERN/{$ACTION;H};\${x;w $TMPFILE"$'\n'";x}" "$FILE"
   SED_EXIT=$?
   N_MATCHES=$(wc -l < "$TMPFILE")
   [[ N_MATCHES -ne 0 ]] && N_MATCHES=$((N_MATCHES - 1))
