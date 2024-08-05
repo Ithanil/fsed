@@ -1,5 +1,5 @@
 Source: ssed
-Section: unknown
+Section: misc
 Priority: optional
 Maintainer: Jan Kessler <jakessle@t-online.de>
 Rules-Requires-Root: no
@@ -12,11 +12,13 @@ Package: ssed
 Architecture: all
 Depends:
  ${misc:Depends},
-Description: ssed, a "safer" sed
- Wrapper around sed that returns with exit code 42, if PATTERN wasn't matched and thus ACTION didn't happen.
- Also supports a mode where exit code is 42 unless PATTERN was matched exactly N times.
-
+Description: "Safer" sed for use in scripts
+ Wrapper around sed that returns with exit code 42,
+ if PATTERN wasn't matched and thus ACTION didn't happen.
+ Also supports a mode where exit code is 42 unless PATTERN
+ was matched exactly N times.
+ .
  Example usage: ssed foo 's//bar/' baz.txt
-
+ .
  Detailed explanation of the mechanism: https://stackoverflow.com/a/15966279
  Script based on stripped down template: https://gist.github.com/Ithanil/b72d61091b73cd8cb0c33de3de593834 
