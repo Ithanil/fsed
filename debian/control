@@ -1,4 +1,4 @@
-Source: ssed
+Source: fsed
 Section: misc
 Priority: optional
 Maintainer: Jan Kessler <jakessle@t-online.de>
@@ -6,19 +6,19 @@ Rules-Requires-Root: no
 Build-Depends:
  debhelper-compat (= 13),
 Standards-Version: 4.6.2
-Homepage: https://github.com/Ithanil/ssed
+Homepage: https://github.com/Ithanil/fsed
 
-Package: ssed
+Package: fsed
 Architecture: all
 Depends:
  ${misc:Depends},
-Description: "Safer" sed for use in scripts
+Description: Wrapper around sed for safe automated find&sed-ing
  Wrapper around sed that returns with exit code 42,
  if PATTERN wasn't matched and thus ACTION didn't happen.
  Also supports a mode where exit code is 42 unless PATTERN
  was matched exactly N times.
  .
- Example usage: ssed foo 's//bar/' baz.txt
+ Example usage: fsed foo 's//bar/' baz.txt
  .
  Detailed explanation of the mechanism: https://stackoverflow.com/a/15966279
  Script based on stripped down template: https://gist.github.com/Ithanil/b72d61091b73cd8cb0c33de3de593834 

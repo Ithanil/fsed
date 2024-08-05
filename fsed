@@ -1,11 +1,11 @@
 #!/bin/bash
-# ssed, a safer sed
+# fsed, a wrapper around sed for safe automated find&sed-ing
 # Author: Jan Kessler
 #
 # Wrapper around sed that returns with exit code 42, if PATTERN wasn't matched and thus ACTION didn't happen.
 # Also supports a mode where exit code is 42 unless PATTERN was matched exactly N times.
 #
-# Example usage: ssed foo 's//bar/' baz.txt
+# Example usage: fsed foo 's//bar/' baz.txt
 #
 # Detailed explanation of the mechanism: https://stackoverflow.com/a/15966279
 # Script based on stripped down template: https://gist.github.com/Ithanil/b72d61091b73cd8cb0c33de3de593834
@@ -31,7 +31,7 @@ Required arguments:
 
 pattern               Pattern to match, e.g. foo
 action                Action to perform, e.g. 's//bar/'
-file                  File to process 
+file                  File to process
 EOF
   exit "$code"
 }

@@ -10,4 +10,4 @@ debian/*.substvars
 debian/*.log
 debian/*.debhelper
 debian/*-stamp
-debian/ssed
+debian/fsed/*

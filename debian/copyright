@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Source: https://github.com/Ithanil/ssed
-Upstream-Name: ssed
+Source: https://github.com/Ithanil/fsed
+Upstream-Name: fsed
 Upstream-Contact: Jan Kessler <jakessle@t-online.de>
 
 Files:

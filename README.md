@@ -1,2 +1,2 @@
-# ssed
+# fsed
 "Safer" sed
