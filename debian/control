@@ -11,7 +11,7 @@ Homepage: https://github.com/Ithanil/fsed
 Package: fsed
 Architecture: all
 Depends:
- ${misc:Depends},
+ ${misc:Depends}, sed
 Description: Wrapper around sed for safe automated find&sed-ing
  Wrapper around sed that returns with exit code 42,
  if PATTERN wasn't matched and thus ACTION didn't happen.
