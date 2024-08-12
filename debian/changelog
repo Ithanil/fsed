@@ -1,3 +1,9 @@
+fsed (0.1.1) UNRELEASED; urgency=medium
+
+  * fix fsed for sed commands like 'd'
+
+ -- Jan Kessler <jakessle@t-online.de>  Mon, 12 Aug 2024 13:13:00 +0200
+
 fsed (0.1) UNRELEASED; urgency=medium
 
   * Initial release.
