@@ -99,7 +99,7 @@ if [[ -n $COUNT_MATCHES ]]
 then
   TMPFILE="$(mktemp)"
   trap 'rm -f -- "$TMPFILE"' EXIT
-  sed "$FOLLOW_SYMLINKS" $SED_OPTS "/$PATTERN/{$ACTION;H};\${x;w $TMPFILE"$'\n'";x}" "$FILE"
+  sed "$FOLLOW_SYMLINKS" $SED_OPTS "/$PATTERN/{H;$ACTION};\${x;w $TMPFILE"$'\n'";x}" "$FILE"
   SED_EXIT=$?
   N_MATCHES=$(wc -l < "$TMPFILE")
   [[ N_MATCHES -ne 0 ]] && N_MATCHES=$((N_MATCHES - 1))
@@ -110,5 +110,5 @@ then
     exit $SED_EXIT
   fi
 else
-  sed "$FOLLOW_SYMLINKS" $SED_OPTS "/$PATTERN/{$ACTION;h};\${x;/./{x;q0};x;q42}" "$FILE"
+  sed "$FOLLOW_SYMLINKS" $SED_OPTS "/$PATTERN/{h;$ACTION};\${x;/./{x;q0};x;q42}" "$FILE"
 fi
