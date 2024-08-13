@@ -1,3 +1,11 @@
+fsed (0.2.0) UNRELEASED; urgency=medium
+
+  * adapted/improved documentation
+  * match unexpected sed exit code behaviors of fsed with and without -c argument
+  * require (or rather allow!) user to specify delimiters within PATTERN argument
+
+ -- Jan Kessler <jakessle@t-online.de>  Tue, 13 Aug 2024 07:45:00 +0200
+
 fsed (0.1.1) UNRELEASED; urgency=medium
 
   * fix fsed for sed commands like 'd'
