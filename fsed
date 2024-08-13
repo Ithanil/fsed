@@ -107,13 +107,14 @@ then
   trap 'rm -f -- "$TMPFILE"' EXIT
   sed "$FOLLOW_SYMLINKS" $SED_OPTS "$PATTERN{H;$ACTION};\${x;w $TMPFILE"$'\n'";x}" "$FILE"
   SED_EXIT=$?
+  [[ SED_EXIT -ne 0 ]] && exit $SED_EXIT
   N_MATCHES=$(wc -l < "$TMPFILE")
   [[ N_MATCHES -ne 0 ]] && N_MATCHES=$((N_MATCHES - 1))
   if [[ $N_MATCHES -ne $COUNT_MATCHES ]]
   then
     exit 42
   else
-    exit $SED_EXIT
+    exit 0
   fi
 else
   sed "$FOLLOW_SYMLINKS" $SED_OPTS "$PATTERN{h;$ACTION};\${x;/./{x;q0};x;q42}" "$FILE"
