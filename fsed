@@ -5,7 +5,7 @@
 # Wrapper around sed that returns with exit code 42, if PATTERN wasn't matched and thus ACTION didn't happen.
 # Also supports a mode where exit code is 42 unless PATTERN was matched exactly N times.
 #
-# Example usage: fsed foo 's//bar/' baz.txt
+# Example usage: fsed '/foo/' 's//bar/' baz.txt
 #
 # Detailed explanation of the mechanism: https://stackoverflow.com/a/15966279
 # Script based on stripped down template: https://gist.github.com/Ithanil/b72d61091b73cd8cb0c33de3de593834
@@ -15,9 +15,9 @@ set -Eeuo pipefail
 usage() {
   local code=${1-0} # specify exit code when used as alternative to die()
   cat <<EOF
-Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-c N] [...] pattern action file
+Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-c N] [...] PATTERN ACTION FILE
 
-Invokes sed like: sed "/pattern/{action}" file
+Invokes sed like: sed "PATTERN{ACTION}" FILE
 
 Available options:
 
@@ -29,9 +29,15 @@ Any other options will be passed on to sed.
 
 Required arguments:
 
-pattern               Pattern to match, e.g. foo
-action                Action to perform, e.g. 's//bar/'
-file                  File to process
+PATTERN               Pattern to match, e.g. '\|foo|' (preceding \ required if not using / delimiter!)
+ACTION                Action to perform, e.g. 's//bar/' (s command auto-detects other delimiters than /)
+FILE                  File to process
+
+Hint: Certain sed commands like 'a' require explicit usage of line breaks, e.g.:
+fsed '/foo/' 'a\
+appended bar line
+' baz.txt
+
 EOF
   exit "$code"
 }
@@ -99,7 +105,7 @@ if [[ -n $COUNT_MATCHES ]]
 then
   TMPFILE="$(mktemp)"
   trap 'rm -f -- "$TMPFILE"' EXIT
-  sed "$FOLLOW_SYMLINKS" $SED_OPTS "/$PATTERN/{H;$ACTION};\${x;w $TMPFILE"$'\n'";x}" "$FILE"
+  sed "$FOLLOW_SYMLINKS" $SED_OPTS "$PATTERN{H;$ACTION};\${x;w $TMPFILE"$'\n'";x}" "$FILE"
   SED_EXIT=$?
   N_MATCHES=$(wc -l < "$TMPFILE")
   [[ N_MATCHES -ne 0 ]] && N_MATCHES=$((N_MATCHES - 1))
@@ -110,5 +116,5 @@ then
     exit $SED_EXIT
   fi
 else
-  sed "$FOLLOW_SYMLINKS" $SED_OPTS "/$PATTERN/{h;$ACTION};\${x;/./{x;q0};x;q42}" "$FILE"
+  sed "$FOLLOW_SYMLINKS" $SED_OPTS "$PATTERN{h;$ACTION};\${x;/./{x;q0};x;q42}" "$FILE"
 fi
